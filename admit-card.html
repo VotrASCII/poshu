@@ -282,10 +282,20 @@
   ];
   var jokeBtn = document.getElementById('jokeBtn');
   var jokeDisplay = document.getElementById('jokeDisplay');
+  var jokeQueue = [];
+  function nextJoke() {
+    if (jokeQueue.length === 0) {
+      jokeQueue = jokes.slice();
+      for (var i = jokeQueue.length - 1; i > 0; i--) {
+        var r = Math.floor(Math.random() * (i + 1));
+        var tmp = jokeQueue[i]; jokeQueue[i] = jokeQueue[r]; jokeQueue[r] = tmp;
+      }
+    }
+    return jokeQueue.pop();
+  }
   if (jokeBtn){
     jokeBtn.addEventListener('click', function(){
-      var j = jokes[Math.floor(Math.random()*jokes.length)];
-      jokeDisplay.textContent = j;
+      jokeDisplay.textContent = nextJoke();
     });
   }
 
