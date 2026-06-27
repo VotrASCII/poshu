@@ -176,7 +176,7 @@
       <div class="rule double"></div>
       <h1>ADMIT CARD</h1>
       <div class="subtitle">Examination of Life — Annual Special Edition</div>
-      <div class="countdown" id="countdown"></div>
+      <div class="countdown">It's your day Goshi 🥳 🥂 🎉</div>
 
       <div class="card-body">
         <div class="photo-box">
@@ -241,32 +241,7 @@
   </div>
 
 <script>
-  function pad(n){ return n < 10 ? '0'+n : ''+n; }
-  function updateCountdown(){
-    var now = new Date();
-    var y = now.getFullYear();
-    var el = document.getElementById('countdown');
-    if (!el) return;
-    if (now.getMonth() === 7 && now.getDate() === 26){
-      el.textContent = "It's your day, Poshu — go top this too. 🎉";
-      return;
-    }
-    var target = new Date(y,7,26);
-    if (now >= target) target = new Date(y+1,7,26);
-    var diff = target - now;
-    var days  = Math.floor(diff / 86400000);
-    var hours = Math.floor((diff % 86400000) / 3600000);
-    var mins  = Math.floor((diff % 3600000)  / 60000);
-    var secs  = Math.floor((diff % 60000)    / 1000);
-    el.innerHTML =
-      '<span class="cd-num">'+days+'</span>d &nbsp;'+
-      '<span class="cd-num">'+pad(hours)+'</span>h &nbsp;'+
-      '<span class="cd-num">'+pad(mins)+'</span>m &nbsp;'+
-      '<span class="cd-num">'+pad(secs)+'</span>s'+
-      '<br><span style="font-size:0.72rem;opacity:0.8">until the next Examination of Life</span>';
-  }
-  updateCountdown();
-  setInterval(updateCountdown, 1000);
+  if (!sessionStorage.getItem('birthdayUnlocked')) { window.location.href = 'index.html'; }
 
   var jokes = [
     "Bwahaha clickbait kyun kar rhe ho!",

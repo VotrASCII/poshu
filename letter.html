@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>For Poshu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Lavishly+Yours&family=IBM+Plex+Sans:wght@400;500;600&family=Special+Elite&display=swap"
+  rel="stylesheet"
+/>
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<style>
+  :root {
+    --paper: #faf5e9;
+    --ink: #1f2a3c;
+    --stamp: #8c2f39;
+    --gold: #b98b2e;
+    --sage: #6e8f71;
+    --line: #d9d0b8;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(160deg, #efe7d4, #f7f1e2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    font-family: "IBM Plex Sans", sans-serif;
+    color: var(--ink);
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 999;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+
+  .wrap {
+    width: 100%; max-width: 480px;
+    display: flex; flex-direction: column; align-items: center;
+    animation: fadeUp 0.65s ease-out both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .eyebrow {
+    font-family: "Special Elite", monospace;
+    font-size: 0.72rem; letter-spacing: 0.18em;
+    text-align: center; color: var(--ink); opacity: 0.7;
+    margin-bottom: 18px;
+  }
+
+  /* ── Envelope ── */
+  .envelope {
+    position: relative; width: 100%; max-width: 320px;
+    aspect-ratio: 3 / 2; cursor: pointer;
+    transition: transform 0.25s ease, filter 0.25s ease;
+  }
+  .envelope:not(.open):hover {
+    transform: translateY(-5px);
+    filter: drop-shadow(0 14px 28px rgba(31,42,60,0.2));
+  }
+  .envelope-back {
+    position: absolute; inset: 0;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+  }
+  .envelope-shadow-l, .envelope-shadow-r {
+    position: absolute; bottom: 0; width: 50%; height: 100%;
+    background: rgba(31,42,60,0.05);
+  }
+  .envelope-shadow-l { left: 0;  clip-path: polygon(0 0, 100% 100%, 0 100%); }
+  .envelope-shadow-r { right: 0; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+  .envelope-flap {
+    position: absolute; top: 0; left: 0; width: 100%; height: 58%;
+    background: var(--sage);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top;
+    transition: transform 0.7s ease;
+    z-index: 3;
+  }
+  .envelope.open .envelope-flap { transform: rotateX(180deg); }
+  .envelope-seal {
+    position: absolute; top: 38%; left: 50%; transform: translate(-50%, -50%);
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--stamp); color: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; line-height: 1.1;
+    font-family: "Special Elite", monospace; font-size: 0.55rem;
+    z-index: 4; transition: opacity 0.3s ease;
+  }
+  .envelope.open .envelope-seal { opacity: 0; }
+  .envelope-label {
+    position: absolute; bottom: 16px; left: 18px;
+    font-family: "Special Elite", monospace; font-size: 0.72rem;
+    color: var(--ink); z-index: 2;
+  }
+
+  /* ── Postage stamp ── */
+  .postage-stamp {
+    position: absolute; top: 10px; right: 12px; z-index: 5;
+    width: 42px; height: 52px;
+    background: var(--paper);
+    border: 1.5px solid var(--gold);
+    box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--gold);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 2px;
+  }
+  .postage-stamp .stamp-icon { font-size: 1.35rem; line-height: 1; }
+  .postage-stamp .stamp-val {
+    font-family: "Special Elite", monospace;
+    font-size: 0.42rem; letter-spacing: 0.05em;
+    color: var(--gold); text-transform: uppercase; text-align: center;
+  }
+
+  /* ── Postmark ── */
+  .postmark {
+    position: absolute; top: 5px; right: 50px; z-index: 5;
+    width: 54px; height: 54px;
+    border: 1.5px solid rgba(140,47,57,0.32);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    font-family: "Special Elite", monospace; font-size: 0.37rem;
+    color: rgba(140,47,57,0.42); letter-spacing: 0.05em; line-height: 1.4;
+    transform: rotate(-10deg);
+  }
+
+  .tap-hint {
+    text-align: center; margin-top: 12px;
+    font-family: "Special Elite", monospace; font-size: 0.68rem;
+    opacity: 0.55; transition: opacity 0.4s ease;
+  }
+  .tap-hint.hide { opacity: 0; }
+
+  /* ── Letter ── */
+  .letter {
+    width: 100%; max-width: 460px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    box-shadow: 0 10px 30px rgba(31,42,60,0.12);
+    padding: 0; margin-top: 0;
+    opacity: 0; max-height: 0; overflow: hidden;
+    transition: opacity 0.7s ease, max-height 0.9s ease, margin-top 0.6s ease;
+  }
+  .letter.show {
+    opacity: 1; max-height: 960px;
+    margin-top: 28px; padding: 32px 28px 34px;
+  }
+  .letter p {
+    font-family: "Lavishly Yours", cursive;
+    font-size: 1.45rem; line-height: 1.85;
+    margin: 0;
+  }
+  .letter p + p { margin-top: 30px; }
+  .letter .sign {
+    text-align: right; font-family: "Lavishly Yours", cursive;
+    font-size: 1.55rem; margin-top: 8px;
+  }
+  .letter .ps {
+    margin-top: 20px; padding-top: 14px;
+    border-top: 1px dashed var(--line);
+    font-family: "Special Elite", monospace;
+    font-size: 0.78rem; opacity: 0.75;
+  }
+
+  .continue-btn {
+    display: block; margin: 22px auto 0;
+    font-family: "Special Elite", monospace;
+    background: var(--ink); color: var(--paper);
+    border: none; padding: 12px 24px;
+    font-size: 0.82rem; letter-spacing: 0.04em;
+    cursor: pointer; opacity: 0; pointer-events: none;
+    transition: opacity 0.5s ease, background 0.2s ease, transform 0.2s ease;
+  }
+  .continue-btn.show { opacity: 1; pointer-events: auto; }
+  .continue-btn:hover { background: var(--sage); transform: translateY(-2px); }
+
+  @media (max-width: 420px) {
+    .envelope { max-width: 260px; }
+    .letter p, .letter .sign { font-size: 1.18rem; }
+    .postage-stamp { width: 34px; height: 42px; top: 8px; right: 10px; }
+    .postage-stamp .stamp-icon { font-size: 1.05rem; }
+    .postmark { width: 44px; height: 44px; right: 40px; top: 6px; font-size: 0.33rem; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">A SMALL DELIVERY FOR GOSHI</div>
+
+    <div class="envelope" id="envelope">
+      <div class="envelope-back"></div>
+      <div class="envelope-shadow-l"></div>
+      <div class="envelope-shadow-r"></div>
+      <div class="envelope-flap"></div>
+      <div class="envelope-seal">TAP<br/>TO<br/>OPEN</div>
+      <div class="envelope-label">To: Poshu</div>
+      <div class="postage-stamp">
+        <div class="stamp-icon">🌿</div>
+        <div class="stamp-val">FRIENDSHIP<br/>MAIL</div>
+      </div>
+      <div class="postmark">26 AUG<br/>─────<br/>SPECIAL<br/>EDITION</div>
+    </div>
+    <div class="tap-hint" id="tapHint">tap the envelope</div>
+
+    <div class="letter" id="letter">
+      <p>Happy Birthday, Poshu.</p>
+      <p>This year asked a lot of you — exams, pressure, and some genuinely hard things outside your control. And you kept showing up anyway. That's worth noticing, even if no one's said it out loud.</p>
+      <p>I'm grateful our sessions turned into whatever this is — the bakchodi, the PYQs, the fried pakoda jokes, you putting up with my cryptic nonsense. It's become one of my favourite parts of the day, consistently.</p>
+      <p>Here's to a year that's a little kinder to you, and to you getting everything you're actually working this hard for.</p>
+      <p class="sign">— Mayank</p>
+      <div class="ps">P.S. — there's an official document waiting for you. It needs your signature.</div>
+    </div>
+
+    <button class="continue-btn" id="continueBtn">Open Your Admit Card →</button>
+  </div>
+
+<script>
+  if (!sessionStorage.getItem('birthdayUnlocked')) { window.location.href = 'index.html'; }
+
+  var envelope = document.getElementById('envelope');
+  var opened = false;
+  envelope.addEventListener('click', function () {
+    if (opened) return;
+    opened = true;
+    envelope.classList.add('open');
+    envelope.style.cursor = 'default';
+    document.getElementById('tapHint').classList.add('hide');
+    setTimeout(function () {
+      document.getElementById('letter').classList.add('show');
+      document.getElementById('continueBtn').classList.add('show');
+    }, 550);
+  });
+
+  document.getElementById('continueBtn').addEventListener('click', function () {
+    window.location.href = 'admit-card.html';
+  });
+</script>
+</body>
+</html>
