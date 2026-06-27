@@ -219,7 +219,7 @@
           <button data-correct="false">Mayank</button>
           <button data-correct="true">Poshu</button>
           <button data-correct="false">The neighbourhood stray</button>
-          <button data-correct="false">Kids from Library/button>
+          <button data-correct="false">Kids from Library</button>
         </div>
         <div class="quiz-feedback" id="quizFeedback"></div>
       </div>
@@ -233,8 +233,8 @@
           <span class="sign-line">Invigilator: Mayank 🫡 <span class="sign-sub">(reporting to: Fried Pakoda)</span></span>
         </div>
         <div class="handwritten-note">
-          Wishing you a brilliant year ahead, Poshu. Here's to more PYQs, more bakchodi,<br />
-          and a lot more wins. — M
+          Wishing you your best years ahead, Poshu.<br/> 
+          -M
         </div>
       </div>
     </div>
@@ -245,15 +245,15 @@
   function updateCountdown(){
     var now = new Date();
     var y = now.getFullYear();
-    var target = new Date(y,7,26);
-    if (now >= target) target = new Date(y+1,7,26);
-    var diff = target - now;
     var el = document.getElementById('countdown');
     if (!el) return;
-    if (diff <= 0){
+    if (now.getMonth() === 7 && now.getDate() === 26){
       el.textContent = "It's your day, Poshu — go top this too. 🎉";
       return;
     }
+    var target = new Date(y,7,26);
+    if (now >= target) target = new Date(y+1,7,26);
+    var diff = target - now;
     var days  = Math.floor(diff / 86400000);
     var hours = Math.floor((diff % 86400000) / 3600000);
     var mins  = Math.floor((diff % 3600000)  / 60000);
@@ -274,7 +274,7 @@
     "Fried pakoda ya chila hua anda? - that is the question! Deep Fried Pakoda is also an option!",
     "Game theory says: 25 min ho 50 min, optimal Poshu hai.",
     "Mai bolun toh mera hi mazak udha dete ho. It is not okay to blackout.",
-    "Hell pe limit hai — ek per day. Doctor ka order, meri taraf se bhi. KFT LFT karao!",
+    "Hell — ek per day. Dr. M has prescribed LFT KFT!",
     "Yes bc you'll just walk 2steps as an unwashed uncombed still in your night suit man.",
     "I am cool. Baal kholu main?",
     "Jo nahi pahauncha vo dusre ko treat karega. Dono pauchgaye toh 12 ghante baithenge.",
