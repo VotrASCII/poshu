@@ -276,22 +276,31 @@
   }
 
   function burstConfetti(count){
-    var colors = ['#B98B2E','#6E8F71','#8C2F39','#1F2A3C'];
+    var colors = ['#B98B2E','#6E8F71','#8C2F39','#1F2A3C','#f2c4ce','#c9e4ca','#aad4f5','#f9e4b7'];
     var container = document.getElementById('confettiContainer');
     if (!container) return;
-    for (var i=0;i<count;i++){
-      var piece = document.createElement('div');
-      piece.className = 'confetti-piece';
-      piece.style.left = (Math.random()*100)+'%';
-      piece.style.background = colors[Math.floor(Math.random()*colors.length)];
-      piece.style.animationDelay = (Math.random()*0.4)+'s';
-      piece.style.animationDuration = (2.2+Math.random()*1.4)+'s';
-      piece.style.transform = 'rotate('+(Math.random()*360)+'deg)';
-      container.appendChild(piece);
-      setTimeout((function(p){ return function(){ p.remove(); }; })(piece), 4000);
+    var batchSize = 80, delay = 0;
+    for (var spawned = 0; spawned < count; spawned += batchSize) {
+      (function(d, remaining) {
+        setTimeout(function() {
+          var n = Math.min(remaining, batchSize);
+          for (var i = 0; i < n; i++) {
+            var piece = document.createElement('div');
+            piece.className = 'confetti-piece';
+            piece.style.left = (Math.random()*100)+'%';
+            piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+            piece.style.animationDelay = (Math.random()*0.2)+'s';
+            piece.style.animationDuration = (3+Math.random()*2)+'s';
+            piece.style.transform = 'rotate('+(Math.random()*360)+'deg)';
+            container.appendChild(piece);
+            setTimeout((function(p){ return function(){ p.remove(); }; })(piece), 6500);
+          }
+        }, d);
+      })(delay, count - spawned);
+      delay += 80;
     }
   }
-  window.addEventListener('load', function(){ burstConfetti(40); });
+  window.addEventListener('load', function(){ burstConfetti(400); });
 
   var seal = document.getElementById('seal');
   if (seal){
@@ -299,7 +308,7 @@
       var el = this;
       el.style.animation = 'none';
       requestAnimationFrame(function(){ el.style.animation = 'stampIn .5s ease-out'; });
-      burstConfetti(16);
+      burstConfetti(150);
     });
   }
 
@@ -310,7 +319,7 @@
         feedback.textContent = 'Correct. Declaring result...';
         document.getElementById('lockedSection').classList.add('unlocked');
         document.getElementById('quizBox').style.display = 'none';
-        burstConfetti(50);
+        burstConfetti(400);
       } else {
         var lines = ['Nahi nahi, try again.','Galat. Sochke batao.','Arre nahi yaar, ek aur try karo.'];
         feedback.textContent = lines[Math.floor(Math.random()*lines.length)];

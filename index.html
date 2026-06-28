@@ -73,7 +73,6 @@
     width: 100%; max-width: 380px; display: block;
     transition: background 0.3s ease, transform 0.2s ease, opacity 0.4s ease;
   }
-  .action-btn.locked { background: var(--ink); opacity: 0.35; cursor: not-allowed; }
   .action-btn.unlocked { background: var(--sage); opacity: 1; cursor: pointer; }
   .action-btn.unlocked:hover { background: var(--stamp); transform: translateY(-2px); }
   .action-btn.pulse { animation: btnPulse 1.6s ease-in-out infinite; }
@@ -179,7 +178,6 @@
       <div class="cd-unit"><span class="cd-num" id="cdSecs">--</span><span class="cd-label">Secs</span></div>
     </div>
     <div class="cd-until">until something special</div>
-    <button class="action-btn locked" id="lockedBtn" disabled>🔒 Access Denied</button>
   </div>
 
   <!-- Birthday experience -->
