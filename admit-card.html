@@ -21,9 +21,10 @@
     --line: #d9d0b8;
   }
   * { box-sizing: border-box; }
-  body {
+  html, body {
     margin: 0;
     min-height: 100vh;
+    max-width: 100%; overflow-x: hidden;
     background: linear-gradient(160deg, #efe7d4, #f7f1e2);
     display: flex;
     align-items: center;
@@ -65,6 +66,7 @@
   .watermark {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
     pointer-events: none;
     font-family: "Playfair Display", serif;
     font-size: 5.5rem; font-weight: 900;
@@ -123,6 +125,13 @@
   table.subjects tbody tr:nth-child(even) td { background: rgba(31,42,60,0.03); }
   table.subjects td:last-child { text-align: right; color: var(--sage); font-weight: 600; }
 
+  /* ── Instructions to the Candidate ── */
+  .instructions { border: 1px solid var(--line); padding: 14px 16px 12px; margin: 0 0 20px; background: rgba(31,42,60,0.015); }
+  .inst-label { font-family: "Special Elite", monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; margin-bottom: 8px; }
+  .instructions ol { margin: 0; padding-left: 20px; font-size: 0.84rem; }
+  .instructions li { margin-bottom: 6px; line-height: 1.55; }
+  .instructions li:last-child { margin-bottom: 0; }
+
   .joke-row { text-align: center; margin: 6px 0 22px; }
   .joke-btn {
     font-family: "Special Elite", monospace; font-size: 0.78rem;
@@ -145,8 +154,25 @@
   }
   .quiz-options button:hover { background: var(--ink); color: var(--paper); transform: translateY(-1px); }
   .quiz-feedback { margin-top: 10px; font-family: "Indie Flower", cursive; font-size: 1.2rem; min-height: 1.4em; color: var(--stamp); }
+  /* ── Candidate signature pad ── */
+  .sig-box { display: none; border: 2px solid var(--ink); padding: 16px; margin: 6px 0 24px; background: rgba(31,42,60,0.03); }
+  .sig-box.show { display: block; animation: riseIn 0.5s ease-out both; }
+  .sig-pad-wrap { position: relative; margin-top: 10px; }
+  #sigPad { display: block; width: 100%; height: 130px; background: var(--paper); border: 1.5px dashed var(--ink); touch-action: none; cursor: crosshair; }
+  .sig-pad-wrap::after { content: ''; position: absolute; left: 8%; right: 8%; bottom: 26px; border-bottom: 1px dotted rgba(31,42,60,0.4); pointer-events: none; }
+  .sig-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: "Special Elite", monospace; font-size: 0.72rem; opacity: 0.45; pointer-events: none; transition: opacity 0.4s ease; }
+  .sig-hint.hide { opacity: 0; }
+  .sig-stamp { position: absolute; top: 10px; right: 12px; padding: 6px 9px; border: 2px solid var(--stamp); color: var(--stamp); font-family: "Special Elite", monospace; font-size: 0.6rem; letter-spacing: 0.08em; text-align: center; line-height: 1.4; opacity: 0; transform: rotate(-12deg) scale(0); pointer-events: none; }
+  .sig-stamp.show { animation: sigStampIn 0.45s ease-out both; }
+  @keyframes sigStampIn { from { opacity: 0; transform: rotate(-12deg) scale(1.7); } to { opacity: 0.9; transform: rotate(-12deg) scale(1); } }
+  .sig-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+  .sig-clear { background: none; border: none; font-family: "Special Elite", monospace; font-size: 0.7rem; opacity: 0.6; cursor: pointer; text-decoration: underline; color: var(--ink); }
+  .sig-submit { font-family: "Special Elite", monospace; font-size: 0.78rem; background: var(--ink); color: var(--paper); border: none; padding: 9px 16px; cursor: pointer; letter-spacing: 0.04em; transition: background .2s, transform .2s, opacity .2s; }
+  .sig-submit:disabled { opacity: 0.35; cursor: default; }
+  .sig-submit:not(:disabled):hover { background: var(--sage); transform: translateY(-2px); }
+
   .locked-section { max-height: 0; overflow: hidden; opacity: 0; transition: max-height .8s ease, opacity .7s ease; }
-  .locked-section.unlocked { max-height: 1400px; opacity: 1; }
+  .locked-section.unlocked { max-height: 1800px; opacity: 1; }
   .result-wrap { position: relative; margin: 4px 0 28px; }
   .result-banner { text-align: center; font-family: "Playfair Display", serif; font-weight: 700; font-size: 1.1rem; color: var(--stamp); border: 2px solid var(--stamp); padding: 10px; letter-spacing: 0.03em; }
   .seal { position: absolute; top: -18px; right: -14px; width: 92px; height: 92px; border-radius: 50%; border: 3px double var(--gold); display: flex; align-items: center; justify-content: center; text-align: center; font-family: "Special Elite", monospace; font-size: 0.58rem; color: var(--gold); letter-spacing: 0.05em; line-height: 1.3; transform: rotate(-16deg); background: rgba(255,255,255,0.55); animation: stampIn 0.5s 0.6s ease-out both; cursor: pointer; }
@@ -155,9 +181,54 @@
   .sign-line { font-family: "Special Elite", monospace; font-size: 0.85rem; border-top: 1px solid var(--ink); padding-top: 8px; display: inline-block; }
   .sign-sub { opacity: 0.6; font-size: 0.78rem; }
   .handwritten-note { margin-top: 24px; font-family: "Over the Rainbow", cursive; font-size: 1.05rem; color: var(--ink); line-height: 1.7; text-align: center; }
+
+  /* ── Make-a-wish finale ── */
+  .wish-scene { text-align: center; margin-top: 34px; padding-bottom: 8px; }
+  .wish-cake { position: relative; width: 130px; height: 120px; margin: 0 auto; cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: none; }
+  .wish-plate { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 126px; height: 12px; border-radius: 50%; background: #cfc5a9; }
+  .wish-body { position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%); width: 94px; height: 52px; border-radius: 8px 8px 4px 4px; background: var(--stamp); }
+  .wish-body::before { content: ''; position: absolute; top: -1px; left: 0; right: 0; height: 16px; border-radius: 8px 8px 12px 12px; background: var(--paper); border-bottom: 2px solid rgba(31,42,60,0.08); }
+  .wish-candle { position: absolute; bottom: 57px; left: 50%; transform: translateX(-50%); width: 9px; height: 28px; background: repeating-linear-gradient(-45deg, #f2c4ce 0 5px, var(--paper) 5px 10px); border: 1px solid rgba(31,42,60,0.15); }
+  .wish-flame {
+    position: absolute; bottom: 86px; left: 50%; width: 14px; height: 20px;
+    transform-origin: 50% 100%;
+    transform: translateX(-50%) scale(1); opacity: 1;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  .wish-flame i {
+    display: block; width: 100%; height: 100%;
+    background: radial-gradient(circle at 50% 72%, #ffdf94 0%, #f5a623 62%, rgba(245,166,35,0) 100%);
+    border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+    box-shadow: 0 0 22px 8px rgba(245,166,35,0.35);
+    animation: flameFlicker 0.32s ease-in-out infinite alternate;
+  }
+  @keyframes flameFlicker {
+    from { transform: scaleX(1) skewX(0deg); }
+    to   { transform: scaleX(0.82) skewX(3deg); }
+  }
+  .wish-flame.dying { transform: translateX(-50%) scale(0.12); opacity: 0.55; transition: transform 1.6s ease, opacity 1.6s ease; }
+  .wish-flame.out { transform: translateX(-50%) scale(0); opacity: 0; transition: transform 0.2s ease, opacity 0.2s ease; }
+  .wish-smoke { position: absolute; bottom: 88px; left: 50%; width: 10px; height: 16px; border-radius: 50%; background: rgba(120,120,120,0.5); filter: blur(4px); opacity: 0; transform: translateX(-50%); pointer-events: none; }
+  .wish-smoke.puff { animation: smokeUp 1.6s ease-out forwards; }
+  @keyframes smokeUp {
+    0%   { opacity: 0.7; transform: translateX(-50%) translateY(0) scale(1); }
+    100% { opacity: 0;   transform: translateX(-46%) translateY(-46px) scale(1.9); }
+  }
+  .wish-caption { margin-top: 14px; font-family: "Special Elite", monospace; font-size: 0.7rem; letter-spacing: 0.08em; opacity: 0.6; min-height: 1.6em; transition: opacity 0.4s ease; }
+  .wish-line { margin-top: 16px; font-family: "Over the Rainbow", cursive; font-size: 1.15rem; color: var(--stamp); opacity: 0; transform: translateY(8px); transition: opacity 1s ease, transform 1s ease; }
+  .wish-line.show { opacity: 1; transform: translateY(0); }
   .confetti-container { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
   .confetti-piece { position: absolute; top: -12px; width: 8px; height: 14px; opacity: 0.9; animation-name: confettiFall; animation-timing-function: ease-in; animation-fill-mode: forwards; }
   @keyframes confettiFall { to { transform: translateY(112vh) rotate(720deg); opacity: 0; } }
+  .spark {
+    position: absolute; width: 5px; height: 5px; border-radius: 50%;
+    animation: sparkFly 0.9s ease-out forwards;
+  }
+  @keyframes sparkFly {
+    0%   { transform: translate(0, 0); opacity: 1; }
+    70%  { transform: translate(var(--dx), var(--dy)); opacity: 1; }
+    100% { transform: translate(var(--dx), calc(var(--dy) + 34px)); opacity: 0; }
+  }
   @media (max-width: 480px) {
     .card { padding: 26px 18px 30px; }
     h1 { font-size: 2.05rem; }
@@ -207,6 +278,16 @@
         </tbody>
       </table>
 
+      <div class="instructions">
+        <div class="inst-label">Instructions to the Candidate</div>
+        <ol>
+          <li>Laughter inside the examination hall is permitted and encouraged.</li>
+          <li>Candidate must accept compliments without argument. Appeals will be rejected.</li>
+          <li>Hell Energy intake is capped at one (1) per day by standing order of Dr. M.</li>
+          <li>Candidate is reminded she already passed the hardest paper this year — it wasn't on the timetable.</li>
+        </ol>
+      </div>
+
       <div class="joke-row">
         <button class="joke-btn" id="jokeBtn">🎲 Random Bakchodi</button>
         <div class="joke-display" id="jokeDisplay"></div>
@@ -224,6 +305,19 @@
         <div class="quiz-feedback" id="quizFeedback"></div>
       </div>
 
+      <div class="sig-box" id="sigBox">
+        <div class="quiz-label">Candidate's Signature — sign to declare result</div>
+        <div class="sig-pad-wrap">
+          <canvas id="sigPad"></canvas>
+          <div class="sig-hint" id="sigHint">sign here with your finger ✍️</div>
+          <div class="sig-stamp" id="sigStamp">SIGNED ✓<br/>26 AUG</div>
+        </div>
+        <div class="sig-actions" id="sigActions">
+          <button type="button" class="sig-clear" id="sigClear">clear</button>
+          <button type="button" class="sig-submit" id="sigSubmit" disabled>Submit Signature</button>
+        </div>
+      </div>
+
       <div class="locked-section" id="lockedSection">
         <div class="result-wrap">
           <div class="result-banner">RESULT: PASS WITH FLYING COLOURS</div>
@@ -233,15 +327,30 @@
           <span class="sign-line">Invigilator: Mayank 🫡 <span class="sign-sub">(reporting to: Fried Pakoda)</span></span>
         </div>
         <div class="handwritten-note">
-          Wishing you your best years ahead, Poshu.<br/> 
+          Wishing you your best years ahead, Poshu.<br/>
           -M
+        </div>
+
+        <div class="wish-scene">
+          <div class="wish-cake" id="wishCake" title="press and hold">
+            <div class="wish-flame" id="wishFlame"><i></i></div>
+            <div class="wish-smoke" id="wishSmoke"></div>
+            <div class="wish-candle"></div>
+            <div class="wish-body"></div>
+            <div class="wish-plate"></div>
+          </div>
+          <div class="wish-caption" id="wishCaption">one last formality — press &amp; hold the candle to make a wish</div>
+          <div class="wish-line" id="wishLine">Whatever you wished for — I hope this is the year it happens. 🤍</div>
         </div>
       </div>
     </div>
   </div>
 
 <script>
-  if (!sessionStorage.getItem('birthdayUnlocked')) { window.location.href = 'index.html'; }
+  // Locked until the day itself: needs both the date and the flag set by
+  // the birthday sequence on index.html.
+  var isBirthday = (new Date().getMonth() === 7 && new Date().getDate() === 26);
+  if (!isBirthday || !sessionStorage.getItem('birthdayUnlocked')) { window.location.href = 'index.html'; }
 
   var jokes = [
     "Bwahaha clickbait kyun kar rhe ho!",
@@ -302,6 +411,69 @@
       delay += 80;
     }
   }
+
+  /* ── Firecrackers ── */
+  var audioCtx = null;
+
+  function fireworkBurst(x, y) {
+    var colors = ['#B98B2E','#8C2F39','#f2c4ce','#aad4f5','#f9e4b7','#6E8F71'];
+    var container = document.getElementById('confettiContainer');
+    if (!container) return;
+    var n = 26;
+    for (var i = 0; i < n; i++) {
+      var spark = document.createElement('div');
+      spark.className = 'spark';
+      var ang = (Math.PI * 2 * i) / n + Math.random() * 0.25;
+      var dist = 55 + Math.random() * 75;
+      spark.style.left = x + 'px';
+      spark.style.top = y + 'px';
+      spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+      spark.style.setProperty('--dx', (Math.cos(ang) * dist) + 'px');
+      spark.style.setProperty('--dy', (Math.sin(ang) * dist) + 'px');
+      container.appendChild(spark);
+      setTimeout((function(s){ return function(){ s.remove(); }; })(spark), 1000);
+    }
+  }
+
+  // Must be called from inside a user gesture (tap/press) or iOS keeps the
+  // context suspended and the pops stay silent.
+  function ensureAudio() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!audioCtx) audioCtx = new AC();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    } catch (e) {}
+  }
+
+  function crackerPop() {
+    try {
+      if (!audioCtx) return;
+      var dur = 0.14;
+      var buffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
+      var data = buffer.getChannelData(0);
+      for (var i = 0; i < data.length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2.2);
+      }
+      var src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+      var gain = audioCtx.createGain();
+      gain.gain.value = 0.22;
+      src.connect(gain); gain.connect(audioCtx.destination);
+      src.start();
+    } catch (e) { /* sound is a bonus; never block the visuals */ }
+  }
+
+  function launchFirecrackers() {
+    for (var i = 0; i < 6; i++) {
+      setTimeout(function () {
+        var x = window.innerWidth  * (0.15 + Math.random() * 0.7);
+        var y = window.innerHeight * (0.12 + Math.random() * 0.4);
+        fireworkBurst(x, y);
+        crackerPop();
+      }, i * 380 + Math.random() * 120);
+    }
+  }
   window.addEventListener('load', function(){ burstConfetti(400); });
 
   var seal = document.getElementById('seal');
@@ -318,16 +490,114 @@
     btn.addEventListener('click', function(){
       var feedback = document.getElementById('quizFeedback');
       if (btn.dataset.correct === 'true'){
-        feedback.textContent = 'Correct. Declaring result...';
-        document.getElementById('lockedSection').classList.add('unlocked');
         document.getElementById('quizBox').style.display = 'none';
-        burstConfetti(400);
+        var box = document.getElementById('sigBox');
+        box.classList.add('show');
+        initSigPad();
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
         var lines = ['Nahi nahi, try again.','Galat. Sochke batao.','Arre nahi yaar, ek aur try karo.'];
         feedback.textContent = lines[Math.floor(Math.random()*lines.length)];
       }
     });
   });
+
+  /* ── Candidate signature pad ── */
+  var sigInit = false;
+  function initSigPad(){
+    if (sigInit) return; sigInit = true;
+    var canvas = document.getElementById('sigPad');
+    var ctx = canvas.getContext('2d');
+    var dpr = window.devicePixelRatio || 1;
+    var rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#1f2a3c';
+
+    var drawing = false, lastX = 0, lastY = 0, inkDist = 0, sigEnabled = true;
+    var submitBtn = document.getElementById('sigSubmit');
+
+    canvas.addEventListener('pointerdown', function(e){
+      if (!sigEnabled) return;
+      drawing = true;
+      canvas.setPointerCapture(e.pointerId);
+      lastX = e.offsetX; lastY = e.offsetY;
+      document.getElementById('sigHint').classList.add('hide');
+    });
+    canvas.addEventListener('pointermove', function(e){
+      if (!drawing || !sigEnabled) return;
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(e.offsetX, e.offsetY);
+      ctx.stroke();
+      inkDist += Math.hypot(e.offsetX - lastX, e.offsetY - lastY);
+      lastX = e.offsetX; lastY = e.offsetY;
+      if (inkDist > 60) submitBtn.disabled = false;
+    });
+    ['pointerup','pointercancel'].forEach(function(ev){
+      canvas.addEventListener(ev, function(){ drawing = false; });
+    });
+
+    document.getElementById('sigClear').addEventListener('click', function(){
+      if (!sigEnabled) return;
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      inkDist = 0; submitBtn.disabled = true;
+      document.getElementById('sigHint').classList.remove('hide');
+    });
+
+    submitBtn.addEventListener('click', function(){
+      if (submitBtn.disabled || !sigEnabled) return;
+      sigEnabled = false;
+      canvas.style.cursor = 'default';
+      document.getElementById('sigActions').style.display = 'none';
+      document.getElementById('sigStamp').classList.add('show');
+      setTimeout(function(){
+        var locked = document.getElementById('lockedSection');
+        locked.classList.add('unlocked');
+        burstConfetti(500);
+        setTimeout(function(){ locked.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 400);
+      }, 750);
+    });
+  }
+
+  /* ── Make-a-wish finale ── */
+  (function(){
+    var cake = document.getElementById('wishCake');
+    var flame = document.getElementById('wishFlame');
+    var caption = document.getElementById('wishCaption');
+    var holdTimer = null, wished = false;
+
+    cake.addEventListener('pointerdown', function(e){
+      if (wished) return;
+      e.preventDefault();
+      ensureAudio();
+      flame.classList.add('dying');
+      holdTimer = setTimeout(blowOut, 1600);
+    });
+    ['pointerup','pointercancel','pointerleave'].forEach(function(ev){
+      cake.addEventListener(ev, function(){
+        if (wished || !holdTimer) return;
+        clearTimeout(holdTimer); holdTimer = null;
+        flame.classList.remove('dying');
+        caption.textContent = 'a proper wish takes a full breath — hold a little longer';
+      });
+    });
+
+    function blowOut(){
+      wished = true; holdTimer = null;
+      flame.classList.remove('dying');
+      flame.classList.add('out');
+      document.getElementById('wishSmoke').classList.add('puff');
+      caption.style.opacity = '0';
+      cake.style.cursor = 'default';
+      setTimeout(function(){
+        document.getElementById('wishLine').classList.add('show');
+        launchFirecrackers();
+      }, 900);
+    }
+  })();
 </script>
 </body>
 </html>

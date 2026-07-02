@@ -23,6 +23,7 @@
   * { box-sizing: border-box; }
   html, body {
     margin: 0; min-height: 100vh;
+    max-width: 100%; overflow-x: hidden;
     background: linear-gradient(160deg, #efe7d4, #f7f1e2);
     display: flex; align-items: center; justify-content: center;
     padding: 32px 16px;
@@ -62,8 +63,45 @@
   }
   .cd-until {
     font-family: "Special Elite", monospace; font-size: 1.1rem;
-    letter-spacing: 0.1em; opacity: 0.5; margin-bottom: 60px;
+    letter-spacing: 0.1em; opacity: 0.5; margin-bottom: 16px;
   }
+  .cd-num.pulse { animation: secPulse 1s ease-in-out infinite; }
+  @keyframes secPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+
+  /* ── Rotating teaser line ── */
+  .teaser {
+    font-family: "Special Elite", monospace; font-size: 0.72rem;
+    letter-spacing: 0.1em; opacity: 0.5; margin-bottom: 60px;
+    min-height: 1.6em; transition: opacity 0.5s ease;
+  }
+  .teaser.fade { opacity: 0; }
+  .teaser-cursor { animation: cursorBlink 1s steps(1) infinite; }
+  @keyframes cursorBlink { 50% { opacity: 0; } }
+
+  /* ── Trotting dog (pre-birthday) ── */
+  .trot-lane {
+    position: fixed; left: 0; right: 0; bottom: 0; height: 84px;
+    overflow: hidden; pointer-events: none; z-index: 5;
+  }
+  .trot-dog {
+    position: absolute; bottom: 14px; left: 0;
+    display: none; pointer-events: none;
+    transform: translateX(-120px);
+  }
+  .trot-dog .trot-emoji {
+    font-size: 2rem; display: inline-block;
+    animation: trotBob 0.3s ease-in-out infinite;
+  }
+  @keyframes trotBob {
+    0%, 100% { transform: scaleX(-1) translateY(0); }
+    50%      { transform: scaleX(-1) translateY(-4px); }
+  }
+  .trot-bubble {
+    position: absolute; bottom: 108%; left: 50%; transform: translateX(-50%);
+    font-family: "Special Elite", monospace; font-size: 0.62rem; white-space: nowrap;
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .trot-bubble.show { opacity: 0.7; }
 
   /* ── Shared button style ── */
   .action-btn {
@@ -120,6 +158,20 @@
   }
   .dog-inner { font-size: 5.5rem; display: inline-block; animation: dogBob 0.22s ease-in-out infinite; }
   @keyframes dogBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+  .paw-trail {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 7px; margin-bottom: 6px; min-height: 88px; justify-content: flex-end;
+  }
+  .paw-trail span { opacity: 0; animation: pawIn 0.45s ease-out forwards; }
+  @keyframes pawIn {
+    from { opacity: 0; transform: var(--pt, none) scale(0.4); }
+    to   { opacity: 0.3; transform: var(--pt, none) scale(1); }
+  }
+  .paw-trail span:nth-child(1) { font-size: 0.55rem; --pt: translateX(-6px) rotate(-14deg); animation-delay: 0.35s; }
+  .paw-trail span:nth-child(2) { font-size: 0.7rem;  --pt: translateX(7px) rotate(12deg);  animation-delay: 0.75s; }
+  .paw-trail span:nth-child(3) { font-size: 0.85rem; --pt: translateX(-8px) rotate(-10deg); animation-delay: 1.15s; }
+  .paw-trail span:nth-child(4) { font-size: 1rem;    --pt: translateX(8px) rotate(14deg);  animation-delay: 1.55s; }
+  .paw-trail span:nth-child(5) { font-size: 1.15rem; --pt: translateX(-6px) rotate(-8deg); animation-delay: 1.95s; }
   .dog-mail-emoji {
     font-size: 2.8rem; margin-top: 2px;
     transform: scale(0); display: block;
@@ -155,6 +207,15 @@
     animation-name: confettiFall; animation-timing-function: ease-in; animation-fill-mode: forwards;
   }
   @keyframes confettiFall { to { transform: translateY(112vh) rotate(720deg); opacity: 0; } }
+  .spark {
+    position: absolute; width: 5px; height: 5px; border-radius: 50%;
+    animation: sparkFly 0.9s ease-out forwards;
+  }
+  @keyframes sparkFly {
+    0%   { transform: translate(0, 0); opacity: 1; }
+    70%  { transform: translate(var(--dx), var(--dy)); opacity: 1; }
+    100% { transform: translate(var(--dx), calc(var(--dy) + 34px)); opacity: 0; }
+  }
 
   @media (max-width: 480px) {
     .cd-num { font-size: 3rem; }
@@ -178,6 +239,15 @@
       <div class="cd-unit"><span class="cd-num" id="cdSecs">--</span><span class="cd-label">Secs</span></div>
     </div>
     <div class="cd-until">until something special</div>
+    <div class="teaser" aria-hidden="true"><span id="teaserText"></span><span class="teaser-cursor">▌</span></div>
+  </div>
+
+  <!-- Trotting dog (pre-birthday ambience) -->
+  <div class="trot-lane" aria-hidden="true">
+    <div class="trot-dog" id="trotDog">
+      <span class="trot-bubble" id="trotBubble">💭 26 aug…</span>
+      <span class="trot-emoji">🐕</span>
+    </div>
   </div>
 
   <!-- Birthday experience -->
@@ -188,6 +258,9 @@
     <div class="playing-msg" id="playingMsg">♩ Playing...</div>
 
     <div class="dog-scene" id="dogScene">
+      <div class="paw-trail" aria-hidden="true">
+        <span>🐾</span><span>🐾</span><span>🐾</span><span>🐾</span><span>🐾</span>
+      </div>
       <div class="dog-wrap">
         <span class="dog-inner">🐕</span>
       </div>
@@ -207,11 +280,111 @@
 
   function pad(n){ return n < 10 ? '0'+n : ''+n; }
 
-  function burstConfetti(count) {
+  /* ── Rotating teaser line (typewriter) ── */
+  var teaserTimer = null;
+  function teaserPool(days) {
+    if (days > 30) return [
+      'the dog has enrolled in delivery training…',
+      'paperwork has been filed with the ministry of chaos…',
+      'a very important envelope has been requisitioned…',
+      'preparations are said to be underway…'
+    ];
+    if (days > 7) return [
+      'the envelope is being sealed…',
+      'ink is drying on something…',
+      'the stamp has been licked. no regrets.',
+      'the dog has passed its fitness test…'
+    ];
+    if (days > 1) return [
+      'the dog is doing warm-up laps…',
+      'final quality checks on the confetti…',
+      'the letter has been proofread twice…',
+      'the seal is being polished…'
+    ];
+    return [
+      'the dog is at the door. it can smell the cake.',
+      'delivery scheduled. do not be late.',
+      'everything is ready. almost.'
+    ];
+  }
+  function startTeaser(days) {
+    var el = document.getElementById('teaserText');
+    var wrap = el.parentElement;
+    var pool = teaserPool(days);
+    var idx = Math.floor(Math.random() * pool.length);
+    function typeLine() {
+      var line = pool[idx]; idx = (idx + 1) % pool.length;
+      wrap.classList.remove('fade');
+      el.textContent = '';
+      var i = 0;
+      teaserTimer = setInterval(function () {
+        el.textContent = line.slice(0, ++i);
+        if (i >= line.length) {
+          clearInterval(teaserTimer);
+          teaserTimer = setTimeout(function () {
+            wrap.classList.add('fade');
+            teaserTimer = setTimeout(typeLine, 600);
+          }, 4600);
+        }
+      }, 42);
+    }
+    typeLine();
+  }
+  function stopTeaser() {
+    clearInterval(teaserTimer);
+    clearTimeout(teaserTimer);
+    document.querySelector('.teaser').style.display = 'none';
+  }
+
+  /* ── Trotting dog ── */
+  var trotStopped = false, trotTimer = null;
+  function scheduleTrot(delay) {
+    trotTimer = setTimeout(runTrot, delay);
+  }
+  function runTrot() {
+    var dog = document.getElementById('trotDog');
+    if (trotStopped || !dog.animate) return;
+    var bubble = document.getElementById('trotBubble');
+    var w = window.innerWidth + 220;
+    var pause = Math.random() < 0.25;
+    dog.style.display = 'block';
+    var anim;
+    if (pause) {
+      var mid = w * 0.45;
+      var dur = 9000;
+      anim = dog.animate([
+        { transform: 'translateX(-120px)' },
+        { transform: 'translateX(' + mid + 'px)', offset: 0.4 },
+        { transform: 'translateX(' + mid + 'px)', offset: 0.62 },
+        { transform: 'translateX(' + w + 'px)' }
+      ], { duration: dur, easing: 'linear' });
+      setTimeout(function () { bubble.classList.add('show'); }, dur * 0.42);
+      setTimeout(function () { bubble.classList.remove('show'); }, dur * 0.62);
+    } else {
+      anim = dog.animate([
+        { transform: 'translateX(-120px)' },
+        { transform: 'translateX(' + w + 'px)' }
+      ], { duration: 7000, easing: 'linear' });
+    }
+    anim.onfinish = function () {
+      dog.style.display = 'none';
+      if (!trotStopped) scheduleTrot(45000 + Math.random() * 45000);
+    };
+  }
+  function stopTrot() {
+    trotStopped = true;
+    clearTimeout(trotTimer);
+    document.getElementById('trotDog').style.display = 'none';
+  }
+
+  // spreadMs (optional): total window to spawn over, so the rain can be
+  // stretched to last exactly as long as the birthday song.
+  function burstConfetti(count, spreadMs) {
     var colors = ['#B98B2E','#6E8F71','#8C2F39','#1F2A3C','#f2c4ce','#c9e4ca','#aad4f5','#f9e4b7'];
     var container = document.getElementById('confettiContainer');
     if (!container) return;
     var batchSize = 80, delay = 0;
+    var step = spreadMs ? spreadMs / Math.ceil(count / batchSize) : 80;
     for (var spawned = 0; spawned < count; spawned += batchSize) {
       (function(d, remaining) {
         setTimeout(function() {
@@ -229,14 +402,65 @@
           }
         }, d);
       })(delay, count - spawned);
-      delay += 80;
+      delay += step;
     }
   }
 
+  /* ── Firecrackers (song finale) ── */
+  var audioCtx = null;
+
+  function fireworkBurst(x, y) {
+    var colors = ['#B98B2E','#8C2F39','#f2c4ce','#aad4f5','#f9e4b7','#6E8F71'];
+    var container = document.getElementById('confettiContainer');
+    if (!container) return;
+    var n = 26;
+    for (var i = 0; i < n; i++) {
+      var spark = document.createElement('div');
+      spark.className = 'spark';
+      var ang = (Math.PI * 2 * i) / n + Math.random() * 0.25;
+      var dist = 55 + Math.random() * 75;
+      spark.style.left = x + 'px';
+      spark.style.top = y + 'px';
+      spark.style.background = colors[Math.floor(Math.random() * colors.length)];
+      spark.style.setProperty('--dx', (Math.cos(ang) * dist) + 'px');
+      spark.style.setProperty('--dy', (Math.sin(ang) * dist) + 'px');
+      container.appendChild(spark);
+      setTimeout((function(s){ return function(){ s.remove(); }; })(spark), 1000);
+    }
+  }
+
+  function crackerPop() {
+    if (!audioCtx) return;
+    var dur = 0.14;
+    var buffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
+    var data = buffer.getChannelData(0);
+    for (var i = 0; i < data.length; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2.2);
+    }
+    var src = audioCtx.createBufferSource();
+    src.buffer = buffer;
+    var gain = audioCtx.createGain();
+    gain.gain.value = 0.22;
+    src.connect(gain); gain.connect(audioCtx.destination);
+    src.start();
+  }
+
+  function launchFirecrackers() {
+    for (var i = 0; i < 6; i++) {
+      setTimeout(function () {
+        var x = window.innerWidth  * (0.15 + Math.random() * 0.7);
+        var y = window.innerHeight * (0.12 + Math.random() * 0.4);
+        fireworkBurst(x, y);
+        crackerPop();
+      }, i * 380 + Math.random() * 120);
+    }
+  }
+
+  // Returns the song duration in ms so callers can sync visuals to it.
   function playBirthdaySong(onEnd) {
     var AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) { if (onEnd) onEnd(); return; }
-    var ctx = new AC();
+    if (!AC) { if (onEnd) onEnd(); return 0; }
+    var ctx = audioCtx = new AC();
     var notes = [
       [261.63,0.75],[261.63,0.25],[293.66,1],[261.63,1],[349.23,1],[329.63,2],
       [261.63,0.75],[261.63,0.25],[293.66,1],[261.63,1],[392.00,1],[349.23,2],
@@ -254,12 +478,15 @@
       t += n[1] * beat; total += n[1] * beat;
     });
     if (onEnd) setTimeout(onEnd, (total + 0.5) * 1000);
+    return (total + 0.5) * 1000;
   }
 
   var countdownTimer = null;
 
   function startBirthdayMode() {
     if (countdownTimer) clearInterval(countdownTimer);
+    stopTrot();
+    stopTeaser();
     sessionStorage.setItem('birthdayUnlocked', '1');
     document.getElementById('countdownView').style.display = 'none';
     document.getElementById('birthdayView').style.display = 'flex';
@@ -267,15 +494,20 @@
 
     document.getElementById('tapOverlay').addEventListener('click', function() {
       this.style.display = 'none';
-      burstConfetti(10000);
       playBirthdaySong(function() {
         document.getElementById('playingMsg').style.display = 'none';
-        var scene = document.getElementById('dogScene');
-        scene.style.display = 'flex';
-        setTimeout(function() { document.getElementById('dogMail').classList.add('pop'); }, 2600);
-        setTimeout(function() { document.getElementById('dogMailMsg').classList.add('show'); }, 3300);
-        setTimeout(function() { document.getElementById('mailBtn').style.display = 'block'; }, 4200);
+        launchFirecrackers();
+        setTimeout(function() {
+          var scene = document.getElementById('dogScene');
+          scene.style.display = 'flex';
+          setTimeout(function() { document.getElementById('dogMail').classList.add('pop'); }, 2600);
+          setTimeout(function() { document.getElementById('dogMailMsg').classList.add('show'); }, 3300);
+          setTimeout(function() { document.getElementById('mailBtn').style.display = 'block'; }, 4200);
+        }, 1100);
       });
+      // 6s spawn window: pieces finish falling right as the song ends,
+      // clearing the sky for the firecracker finale.
+      burstConfetti(2000, 6000);
     });
 
     document.getElementById('mailBtn').addEventListener('click', function() {
@@ -296,9 +528,13 @@
       document.getElementById('cdHours').textContent = pad(Math.floor((diff % 86400000) / 3600000));
       document.getElementById('cdMins').textContent  = pad(Math.floor((diff % 3600000)  / 60000));
       document.getElementById('cdSecs').textContent  = pad(Math.floor((diff % 60000)    / 1000));
+      if (diff < 86400000) document.getElementById('cdSecs').classList.add('pulse');
+      return diff;
     }
-    updateCountdown();
+    var msLeft = updateCountdown();
     countdownTimer = setInterval(updateCountdown, 1000);
+    startTeaser(Math.floor((msLeft || 0) / 86400000));
+    scheduleTrot(7000 + Math.random() * 8000);
   }
 </script>
 </body>

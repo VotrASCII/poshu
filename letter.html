@@ -24,6 +24,7 @@
   html, body {
     margin: 0;
     min-height: 100vh;
+    max-width: 100%; overflow-x: hidden;
     background: linear-gradient(160deg, #efe7d4, #f7f1e2);
     display: flex;
     align-items: center;
@@ -158,6 +159,11 @@
     font-size: 1.45rem; line-height: 1.85;
     margin: 0;
   }
+  .letter .reveal-item {
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .letter .reveal-item.ink { opacity: 1; transform: translateY(0); }
   .letter p + p { margin-top: 30px; }
   .letter .sign {
     text-align: right; font-family: "Lavishly Yours", cursive;
@@ -211,19 +217,22 @@
     <div class="tap-hint" id="tapHint">tap the envelope</div>
 
     <div class="letter" id="letter">
-      <p>Happy Birthday, Poshu.</p>
-      <p>This year asked a lot of you — exams, pressure, and some genuinely hard things outside your control. And you kept showing up anyway. That's worth noticing, even if no one's said it out loud.</p>
-      <p>I'm grateful our sessions turned into whatever this is — the bakchodi, the PYQs, the fried pakoda jokes, you putting up with my cryptic nonsense. It's become one of my favourite parts of the day, consistently.</p>
-      <p>Here's to a year that's a little kinder to you, and to you getting everything you're actually working this hard for.</p>
-      <p class="sign">— Mayank</p>
-      <div class="ps">P.S. — there's an official document waiting for you. It needs your signature.</div>
+      <p class="reveal-item">Happy Birthday, Poshu.</p>
+      <p class="reveal-item">This year asked a lot of you — exams, pressure, and some genuinely hard things outside your control. And you kept showing up anyway. That's worth noticing, even if no one's said it out loud.</p>
+      <p class="reveal-item">I'm grateful our sessions turned into whatever this is — the bakchodi, the PYQs, the fried pakoda jokes, you putting up with my cryptic nonsense. It's become one of my favourite parts of the day, consistently.</p>
+      <p class="reveal-item">Here's to a year that's a little kinder to you, and to you getting everything you're actually working this hard for.</p>
+      <p class="sign reveal-item">— Mayank</p>
+      <div class="ps reveal-item">P.S. — there's an official document waiting for you. It needs your signature.</div>
     </div>
 
     <button class="continue-btn" id="continueBtn">Open Your Admit Card →</button>
   </div>
 
 <script>
-  if (!sessionStorage.getItem('birthdayUnlocked')) { window.location.href = 'index.html'; }
+  // Locked until the day itself: needs both the date and the flag set by
+  // the birthday sequence on index.html.
+  var isBirthday = (new Date().getMonth() === 7 && new Date().getDate() === 26);
+  if (!isBirthday || !sessionStorage.getItem('birthdayUnlocked')) { window.location.href = 'index.html'; }
 
   var envelope = document.getElementById('envelope');
   var opened = false;
@@ -235,7 +244,14 @@
     document.getElementById('tapHint').classList.add('hide');
     setTimeout(function () {
       document.getElementById('letter').classList.add('show');
-      document.getElementById('continueBtn').classList.add('show');
+      // Ink reveal: each line fades in at reading pace.
+      var items = document.querySelectorAll('#letter .reveal-item');
+      items.forEach(function (item, i) {
+        setTimeout(function () { item.classList.add('ink'); }, 500 + i * 800);
+      });
+      setTimeout(function () {
+        document.getElementById('continueBtn').classList.add('show');
+      }, 500 + items.length * 800 + 300);
     }, 550);
   });
 
